@@ -3,7 +3,9 @@ import { GoogleGenAI, Type } from '@google/genai';
 import type { ScheduleEvent } from '../types';
 
 // NOTE: This assumes the API key is available in the environment variables.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Vite uses import.meta.env for environment variables
+// On Vercel, set VITE_GEMINI_API_KEY in the dashboard
+const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
 
 /**
  * Converts a File object to a base64 encoded string.
