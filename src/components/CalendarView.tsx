@@ -61,60 +61,135 @@ export const CalendarView: React.FC = () => {
     }
 
     try {
-      // Find all scrollable elements within the calendar
-      const scrollableElements = calendarEl.querySelectorAll('.fc-scroller');
-      const originalStyles: { element: Element; overflow: string; height: string; maxHeight: string }[] = [];
+      // Get calendar API to temporarily show all events
+      const calendarApi = calendarApiRef.current?.getApi();
+      const originalDayMaxEvents = calendarApi?.getOption('dayMaxEvents');
+
+      // Temporarily remove event limit to show all events
+      if (calendarApi) {
+        calendarApi.setOption('dayMaxEvents', false);
+      }
+
+      // Find ALL elements that might have overflow/scroll restrictions
+      const allElements = calendarEl.querySelectorAll(
+        '.fc-scroller, .fc-view-harness, .fc-daygrid-body, .fc-timegrid-body, .fc-scrollgrid, .calendar-container, .fc'
+      );
+
+      const originalStyles: {
+        element: Element;
+        overflow: string;
+        overflowX: string;
+        overflowY: string;
+        height: string;
+        maxHeight: string;
+        minHeight: string;
+      }[] = [];
+
+      // Also handle the wrapper element itself
+      const wrapperEl = calendarEl as HTMLElement;
+      originalStyles.push({
+        element: calendarEl,
+        overflow: wrapperEl.style.overflow,
+        overflowX: wrapperEl.style.overflowX,
+        overflowY: wrapperEl.style.overflowY,
+        height: wrapperEl.style.height,
+        maxHeight: wrapperEl.style.maxHeight,
+        minHeight: wrapperEl.style.minHeight,
+      });
 
       // Store original styles and temporarily adjust for full capture
-      scrollableElements.forEach((el) => {
+      allElements.forEach((el) => {
         const htmlEl = el as HTMLElement;
         originalStyles.push({
           element: el,
           overflow: htmlEl.style.overflow,
+          overflowX: htmlEl.style.overflowX,
+          overflowY: htmlEl.style.overflowY,
           height: htmlEl.style.height,
           maxHeight: htmlEl.style.maxHeight,
+          minHeight: htmlEl.style.minHeight,
         });
 
         // Temporarily adjust styles to show all content
         htmlEl.style.overflow = 'visible';
+        htmlEl.style.overflowX = 'visible';
+        htmlEl.style.overflowY = 'visible';
         htmlEl.style.height = 'auto';
         htmlEl.style.maxHeight = 'none';
+        htmlEl.style.minHeight = 'auto';
       });
 
-      // Wait a bit for styles to apply
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Also temporarily adjust wrapper overflow
+      wrapperEl.style.overflow = 'visible';
+      wrapperEl.style.overflowX = 'visible';
+      wrapperEl.style.overflowY = 'visible';
 
-      // Capture the calendar
+      // Wait for DOM updates and layout recalculation
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      // Get the actual content dimensions after expansion
+      const contentWidth = Math.max(
+        calendarEl.scrollWidth,
+        calendarEl.offsetWidth,
+        ...Array.from(allElements).map(el => (el as HTMLElement).scrollWidth || 0)
+      );
+      const contentHeight = Math.max(
+        calendarEl.scrollHeight,
+        calendarEl.offsetHeight,
+        ...Array.from(allElements).map(el => (el as HTMLElement).scrollHeight || 0)
+      );
+
+      // Capture the calendar with expanded dimensions
       const canvas = await (window as any).html2canvas(calendarEl, {
         useCORS: true,
         allowTaint: true,
         backgroundColor: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
         scale: 2, // Higher quality
         logging: false,
-        windowWidth: calendarEl.scrollWidth,
-        windowHeight: calendarEl.scrollHeight,
+        width: contentWidth,
+        height: contentHeight,
+        windowWidth: contentWidth,
+        windowHeight: contentHeight,
+        scrollX: 0,
+        scrollY: 0,
         onclone: (clonedDoc: Document) => {
-          // Ensure all content is visible in the clone
-          const clonedCalendar = clonedDoc.querySelector('.fc');
-          if (clonedCalendar) {
-            const clonedScrollers = clonedCalendar.querySelectorAll('.fc-scroller');
-            clonedScrollers.forEach((scroller) => {
-              const htmlScroller = scroller as HTMLElement;
-              htmlScroller.style.overflow = 'visible';
-              htmlScroller.style.height = 'auto';
-              htmlScroller.style.maxHeight = 'none';
-            });
+          // Ensure all content is visible in the cloned document
+          const clonedWrapper = clonedDoc.body.querySelector('[class*="overflow-hidden"]');
+          if (clonedWrapper) {
+            (clonedWrapper as HTMLElement).style.overflow = 'visible';
           }
+
+          const clonedElements = clonedDoc.querySelectorAll(
+            '.fc-scroller, .fc-view-harness, .fc-daygrid-body, .fc-timegrid-body, .fc-scrollgrid, .calendar-container, .fc'
+          );
+
+          clonedElements.forEach((el) => {
+            const htmlEl = el as HTMLElement;
+            htmlEl.style.overflow = 'visible';
+            htmlEl.style.overflowX = 'visible';
+            htmlEl.style.overflowY = 'visible';
+            htmlEl.style.height = 'auto';
+            htmlEl.style.maxHeight = 'none';
+            htmlEl.style.minHeight = 'auto';
+          });
         }
       });
 
       // Restore original styles
-      originalStyles.forEach(({ element, overflow, height, maxHeight }) => {
+      originalStyles.forEach(({ element, overflow, overflowX, overflowY, height, maxHeight, minHeight }) => {
         const htmlEl = element as HTMLElement;
         htmlEl.style.overflow = overflow;
+        htmlEl.style.overflowX = overflowX;
+        htmlEl.style.overflowY = overflowY;
         htmlEl.style.height = height;
         htmlEl.style.maxHeight = maxHeight;
+        htmlEl.style.minHeight = minHeight;
       });
+
+      // Restore event limit
+      if (calendarApi && originalDayMaxEvents !== undefined) {
+        calendarApi.setOption('dayMaxEvents', originalDayMaxEvents);
+      }
 
       // Download the image
       const link = document.createElement('a');
