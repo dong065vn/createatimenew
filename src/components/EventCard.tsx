@@ -53,22 +53,25 @@ export const EventCard: React.FC<EventCardProps> = ({ eventInfo }) => {
   const event = eventInfo.event.extendedProps as ScheduleEvent;
   const isConflict = event.hasConflict;
 
-  const baseClasses = 'h-full p-1.5 text-xs overflow-hidden flex flex-col w-full rounded-sm';
+  const baseClasses = 'h-full p-2 text-xs overflow-hidden flex flex-col w-full rounded-lg shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer backdrop-blur-sm';
 
   if (isConflict) {
-    // For conflicts, we use a simpler, high-contrast style to draw attention.
-    const conflictStyle = 'bg-red-100 text-red-800 border-l-4 border-red-500 dark:bg-red-900/50 dark:text-red-200 dark:border-red-500';
+    // For conflicts, we use a simpler, high-contrast style to draw attention with animation
+    const conflictStyle = 'bg-gradient-to-br from-red-50 to-red-100 text-red-900 border-l-4 border-red-500 dark:from-red-900/40 dark:to-red-800/40 dark:text-red-100 dark:border-red-400 animate-pulse-subtle';
     return (
       <div className={`${baseClasses} ${conflictStyle}`}>
-          <div className="font-bold truncate">{eventInfo.event.title}</div>
-          <div className="opacity-90">{formatEventTime(eventInfo.event.start)}</div>
+          <div className="font-bold truncate text-sm mb-1 flex items-center gap-1">
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+            {eventInfo.event.title}
+          </div>
+          <div className="opacity-90 font-medium">{formatEventTime(eventInfo.event.start)}</div>
           {event.location && (
-              <div className="opacity-90 truncate">
-                  {event.location}
+              <div className="opacity-80 truncate text-[10px] mt-0.5">
+                  📍 {event.location}
               </div>
           )}
           {event.instructor && (
-            <div className="opacity-90 truncate">{event.instructor}</div>
+            <div className="opacity-80 truncate text-[10px]">👤 {event.instructor}</div>
           )}
       </div>
     );
@@ -77,25 +80,34 @@ export const EventCard: React.FC<EventCardProps> = ({ eventInfo }) => {
   const baseColor = event.color || '#3b82f6'; // Default to primary-500
 
   const customStyle: React.CSSProperties = {
-    backgroundColor: lightenColor(baseColor, 85),
+    background: `linear-gradient(135deg, ${lightenColor(baseColor, 90)} 0%, ${lightenColor(baseColor, 80)} 100%)`,
     borderLeft: `4px solid ${baseColor}`,
+    boxShadow: `0 2px 4px ${baseColor}20`,
   };
 
-  const titleStyle: React.CSSProperties = { color: darkenColor(baseColor, 15) };
-  const detailsStyle: React.CSSProperties = { color: darkenColor(baseColor, 5) };
+  const titleStyle: React.CSSProperties = {
+    color: darkenColor(baseColor, 20),
+    fontWeight: 600,
+  };
+  const detailsStyle: React.CSSProperties = {
+    color: darkenColor(baseColor, 10),
+  };
 
   return (
     <div style={customStyle} className={baseClasses}>
-        <div style={titleStyle} className="font-bold truncate">{eventInfo.event.title}</div>
-        <div style={detailsStyle}>{formatEventTime(eventInfo.event.start)}</div>
+        <div style={titleStyle} className="truncate text-sm mb-1 leading-tight">{eventInfo.event.title}</div>
+        <div style={detailsStyle} className="font-medium flex items-center gap-1">
+          <span className="inline-block w-1 h-1 rounded-full opacity-60" style={{backgroundColor: baseColor}}></span>
+          {formatEventTime(eventInfo.event.start)}
+        </div>
         {event.location && (
-            <div style={detailsStyle} className="truncate">
-                {event.location}
+            <div style={detailsStyle} className="truncate text-[10px] mt-0.5 opacity-80">
+                📍 {event.location}
             </div>
         )}
         {event.instructor && (
-            <div style={detailsStyle} className="truncate">
-                {event.instructor}
+            <div style={detailsStyle} className="truncate text-[10px] opacity-80">
+                👤 {event.instructor}
             </div>
         )}
     </div>

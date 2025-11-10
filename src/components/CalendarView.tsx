@@ -25,19 +25,19 @@ export const CalendarView: React.FC = () => {
 
   const conflictingEventIds = useMemo(() => getConflictingEventIds(events), [events]);
 
-  const handleEventDrop = (arg: EventDropArg) => {
+  const handleEventDrop = useCallback((arg: EventDropArg) => {
     const { event } = arg;
     if (event.start && event.end) {
       updateEvent(event.id, { start: event.start, end: event.end });
     }
-  };
+  }, [updateEvent]);
 
-  const handleEventClick = (arg: EventClickArg) => {
+  const handleEventClick = useCallback((arg: EventClickArg) => {
     const clickedEvent = events.find(e => e.id === arg.event.id);
     if (clickedEvent) {
         setEditingEvent(clickedEvent);
     }
-  };
+  }, [events, setEditingEvent]);
 
   const handleDatesSet = useCallback((viewInfo: { view: ViewApi }) => {
     setCalendarTitle(viewInfo.view.title);
@@ -69,7 +69,7 @@ export const CalendarView: React.FC = () => {
     }
   }, []);
 
-  const calendarEvents = events.map(event => ({
+  const calendarEvents = useMemo(() => events.map(event => ({
     id: event.id,
     title: event.title,
     start: event.start,
@@ -78,11 +78,11 @@ export const CalendarView: React.FC = () => {
       ...event,
       hasConflict: conflictingEventIds.includes(event.id)
     },
-  }));
+  })), [events, conflictingEventIds]);
 
   return (
-    <Card ref={calendarWrapperRef} className="h-full flex flex-col overflow-hidden">
-        <CalendarHeader 
+    <Card ref={calendarWrapperRef} className="h-full flex flex-col overflow-hidden shadow-xl rounded-xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700">
+        <CalendarHeader
           title={calendarTitle}
           view={currentView}
           onPrev={handlePrev}
@@ -91,7 +91,7 @@ export const CalendarView: React.FC = () => {
           onViewChange={handleViewChange}
           onDownloadImage={handleDownloadImage}
         />
-      <div className="flex-grow calendar-container px-4 pb-4">
+      <div className="flex-grow calendar-container px-4 pb-4 transition-all duration-300">
         <FullCalendar
           ref={calendarApiRef}
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
@@ -104,6 +104,13 @@ export const CalendarView: React.FC = () => {
           eventContent={(eventInfo) => <EventCard eventInfo={eventInfo} />}
           height="100%"
           datesSet={handleDatesSet}
+          eventClassNames="cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg"
+          dayMaxEvents={3}
+          moreLinkClick="popover"
+          nowIndicator={true}
+          slotMinTime="07:00:00"
+          slotMaxTime="22:00:00"
+          expandRows={true}
         />
       </div>
     </Card>

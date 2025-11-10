@@ -64,38 +64,42 @@ export const EventListPanel: React.FC = () => {
   }, [filteredEvents]);
 
   return (
-    <Card className="h-full flex flex-col">
-      <div className="p-3 border-b border-gray-200 dark:border-gray-700">
-        <h2 className="text-lg font-semibold">{t('eventList.title')} ({events.length})</h2>
+    <Card className="h-full flex flex-col shadow-xl rounded-xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700">
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-primary-50 to-blue-50 dark:from-gray-800 dark:to-gray-750">
+        <h2 className="text-xl font-bold bg-gradient-to-r from-primary-700 to-blue-600 dark:from-primary-400 dark:to-blue-400 bg-clip-text text-transparent">
+          {t('eventList.title')} <span className="inline-flex items-center justify-center min-w-[2rem] h-7 px-2 ml-2 text-sm font-semibold bg-primary-600 text-white rounded-full shadow-md">{events.length}</span>
+        </h2>
       </div>
-      <div className="p-3">
+      <div className="p-4">
         <EventFilter searchTerm={searchTerm} onSearchTermChange={setSearchTerm} />
       </div>
        {conflictingEventIds.length > 0 && (
-        <div className="px-3 pb-2 text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
-          <AlertTriangle className="w-4 h-4" />
-          <span>{t('eventList.conflicts_detected', { count: conflictingEventIds.length })}</span>
+        <div className="px-4 pb-3 text-sm text-red-700 dark:text-red-300 flex items-center gap-2 bg-red-50 dark:bg-red-900/20 mx-4 mb-2 p-3 rounded-lg border border-red-200 dark:border-red-800 animate-slide-in">
+          <AlertTriangle className="w-5 h-5 animate-pulse" />
+          <span className="font-semibold">{t('eventList.conflicts_detected', { count: conflictingEventIds.length })}</span>
         </div>
       )}
-      <div className="flex-grow overflow-y-auto p-3">
+      <div className="flex-grow overflow-y-auto p-4 custom-scrollbar">
         {sortedEvents.length > 0 ? (
           <ul className="space-y-3">
-            {sortedEvents.map((event) => (
-              <EventListItem 
-                key={event.id} 
-                event={event} 
-                isConflicting={conflictingEventIds.includes(event.id)}
-              />
+            {sortedEvents.map((event, index) => (
+              <li key={event.id} className="animate-slide-in" style={{ animationDelay: `${index * 0.05}s` }}>
+                <EventListItem
+                  event={event}
+                  isConflicting={conflictingEventIds.includes(event.id)}
+                />
+              </li>
             ))}
           </ul>
         ) : (
-          <div className="text-center py-10 text-gray-500 dark:text-gray-400">
-            <p>{searchTerm ? t('eventList.no_events_match') : t('eventList.no_events_found')}</p>
+          <div className="text-center py-16 text-gray-500 dark:text-gray-400">
+            <div className="text-6xl mb-4 opacity-30">📅</div>
+            <p className="text-lg font-medium">{searchTerm ? t('eventList.no_events_match') : t('eventList.no_events_found')}</p>
           </div>
         )}
       </div>
-      <div className="p-3 border-t border-gray-200 dark:border-gray-700 flex flex-wrap gap-2 justify-between">
-        <div className="flex gap-2">
+      <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex flex-col gap-3">
+        <div className="flex flex-wrap gap-2">
           <input
             ref={importInputRef}
             type="file"
@@ -107,26 +111,27 @@ export const EventListPanel: React.FC = () => {
           <Button
             variant="outline"
             onClick={() => importInputRef.current?.click()}
+            className="flex-1 sm:flex-initial"
           >
             <Upload className="w-4 h-4 mr-2" />
             {t('eventList.import')}
           </Button>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={() => exportToICS(events)} disabled={events.length === 0}>
-            <Download className="w-4 h-4 mr-2" />
+          <Button variant="outline" onClick={() => exportToICS(events)} disabled={events.length === 0} className="text-xs">
+            <Download className="w-3 h-3 mr-1" />
             {t('eventList.export_ics')}
           </Button>
-          <Button variant="outline" onClick={() => exportToJSON(events)} disabled={events.length === 0}>
-            <Download className="w-4 h-4 mr-2" />
+          <Button variant="outline" onClick={() => exportToJSON(events)} disabled={events.length === 0} className="text-xs">
+            <Download className="w-3 h-3 mr-1" />
             {t('eventList.export_json')}
           </Button>
-          <Button variant="outline" onClick={() => exportToTXT(events)} disabled={events.length === 0}>
-            <FileText className="w-4 h-4 mr-2" />
+          <Button variant="outline" onClick={() => exportToTXT(events)} disabled={events.length === 0} className="text-xs">
+            <FileText className="w-3 h-3 mr-1" />
             {t('eventList.export_txt')}
           </Button>
-           <Button variant="secondary" className="sm:hidden" onClick={reset}>
-              <Upload className="w-4 h-4 mr-2" />
+           <Button variant="secondary" className="sm:hidden text-xs" onClick={reset}>
+              <Upload className="w-3 h-3 mr-1" />
               {t('eventList.new')}
             </Button>
         </div>
