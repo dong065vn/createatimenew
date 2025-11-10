@@ -4,7 +4,7 @@
 
 - Tài khoản GitHub (đã có repository này)
 - Tài khoản Vercel (miễn phí) tại [vercel.com](https://vercel.com)
-- GEMINI_API_KEY (để sử dụng Google Gemini AI)
+- Google Gemini API Key (để sử dụng Google Gemini AI)
 
 ## 🚀 Cách 1: Deploy qua Vercel Dashboard (Khuyến nghị)
 
@@ -37,10 +37,12 @@ Vercel sẽ tự động phát hiện cấu hình từ file `vercel.json`. Kiể
 
 1. Trong phần **"Environment Variables"**, thêm:
    ```
-   Name: GEMINI_API_KEY
+   Name: VITE_GEMINI_API_KEY
    Value: [API key của bạn]
    ```
 2. Chọn môi trường: **Production**, **Preview**, và **Development**
+
+**LƯU Ý**: Tên biến phải là `VITE_GEMINI_API_KEY` (có prefix `VITE_`) vì Vite yêu cầu tất cả environment variables phải bắt đầu bằng `VITE_` để được expose ra client-side code.
 
 ### Bước 5: Deploy
 
@@ -79,8 +81,10 @@ vercel --prod
 ### Thêm Environment Variable qua CLI
 
 ```bash
-vercel env add GEMINI_API_KEY
+vercel env add VITE_GEMINI_API_KEY
 ```
+
+Nhập API key khi được hỏi và chọn môi trường (Production/Preview/Development).
 
 ## 🔄 Auto Deploy
 
@@ -95,9 +99,6 @@ File `vercel.json` đã được cấu hình:
 
 ```json
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "framework": "vite",
   "rewrites": [
     {
       "source": "/(.*)",
@@ -108,19 +109,41 @@ File `vercel.json` đã được cấu hình:
 ```
 
 Cấu hình này:
-- ✅ Sử dụng Vite framework
-- ✅ Build với lệnh `npm run build`
-- ✅ Output vào thư mục `dist`
-- ✅ Hỗ trợ client-side routing (SPA)
+- ✅ Vercel tự động phát hiện Vite framework từ `package.json`
+- ✅ Tự động sử dụng `npm run build` để build
+- ✅ Tự động output vào thư mục `dist`
+- ✅ Hỗ trợ client-side routing (SPA) qua rewrites rule
 
-## 🔑 Lấy GEMINI_API_KEY
+## 🔑 Lấy Google Gemini API Key
 
 Nếu chưa có API key:
 
 1. Truy cập [Google AI Studio](https://makersuite.google.com/app/apikey)
 2. Click **"Create API Key"**
 3. Copy API key
-4. Thêm vào Vercel Environment Variables
+4. Thêm vào Vercel Environment Variables với tên `VITE_GEMINI_API_KEY`
+
+## 💻 Chạy Local (Tùy chọn)
+
+Nếu muốn chạy local trước khi deploy:
+
+1. Tạo file `.env` hoặc `.env.local`:
+   ```bash
+   cp .env.example .env.local
+   ```
+
+2. Mở file `.env.local` và thêm API key:
+   ```
+   VITE_GEMINI_API_KEY=your_actual_api_key_here
+   ```
+
+3. Cài đặt dependencies và chạy:
+   ```bash
+   npm install
+   npm run dev
+   ```
+
+4. Mở trình duyệt tại `http://localhost:3000`
 
 ## 📱 Kiểm tra Deploy
 
@@ -132,10 +155,12 @@ Sau khi deploy thành công:
 
 ## ⚠️ Xử lý lỗi thường gặp
 
-### Lỗi: "API key not found"
+### Lỗi: "API key not found" hoặc "undefined API key"
 
-- Kiểm tra đã thêm `GEMINI_API_KEY` vào Environment Variables chưa
+- Kiểm tra đã thêm `VITE_GEMINI_API_KEY` vào Environment Variables chưa
+- **QUAN TRỌNG**: Tên biến phải chính xác là `VITE_GEMINI_API_KEY` (có prefix `VITE_`)
 - Redeploy lại project sau khi thêm biến môi trường
+- Vào Settings → Environment Variables trên Vercel Dashboard để kiểm tra
 
 ### Lỗi: "Build failed"
 
