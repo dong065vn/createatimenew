@@ -5,9 +5,14 @@ import react from '@vitejs/plugin-react';
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
     return {
+      // base can be overridden by setting BASE_URL in the environment
+      base: process.env.BASE_URL || '/',
       server: {
         port: 3000,
         host: '0.0.0.0',
+      },
+      build: {
+        outDir: 'dist'
       },
       plugins: [react()],
       define: {
