@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { useScheduleStore } from '../store/scheduleStore';
 import { Card } from './ui/Card';
 import { EventListItem } from './EventListItem';
@@ -6,16 +6,47 @@ import { EventFilter } from './EventFilter';
 import { Download, Upload, AlertTriangle, FileText } from 'lucide-react';
 import { Button } from './ui/Button';
 import { exportToICS, exportToJSON, exportToTXT } from '../services/exportService';
+import { importFromJSON, importFromICS } from '../services/importService';
 import { getConflictingEventIds } from '../utils/eventUtils';
 import { useLanguageStore } from '../store/languageStore';
 
 export const EventListPanel: React.FC = () => {
   const { t } = useLanguageStore();
   const events = useScheduleStore((state) => state.events);
+  const setEvents = useScheduleStore((state) => state.setEvents);
   const reset = useScheduleStore((state) => state.reset);
   const [searchTerm, setSearchTerm] = useState('');
+  const importInputRef = useRef<HTMLInputElement>(null);
 
   const conflictingEventIds = useMemo(() => getConflictingEventIds(events), [events]);
+
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      let importedEvents;
+      const fileName = file.name.toLowerCase();
+
+      if (fileName.endsWith('.json')) {
+        importedEvents = await importFromJSON(file);
+      } else if (fileName.endsWith('.ics')) {
+        importedEvents = await importFromICS(file);
+      } else {
+        alert(t('eventList.import_error_format') || 'Unsupported file format. Please use JSON or ICS files.');
+        return;
+      }
+
+      setEvents(importedEvents);
+      alert(t('eventList.import_success', { count: importedEvents.length }) || `Successfully imported ${importedEvents.length} events.`);
+    } catch (error) {
+      alert(t('eventList.import_error') || `Import failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+
+    if (importInputRef.current) {
+      importInputRef.current.value = '';
+    }
+  };
 
   const filteredEvents = useMemo(() => {
     if (!searchTerm) return events;
@@ -63,23 +94,42 @@ export const EventListPanel: React.FC = () => {
           </div>
         )}
       </div>
-      <div className="p-3 border-t border-gray-200 dark:border-gray-700 flex flex-wrap gap-2 justify-end">
-        <Button variant="outline" onClick={() => exportToICS(events)} disabled={events.length === 0}>
-          <Download className="w-4 h-4 mr-2" />
-          {t('eventList.export_ics')}
-        </Button>
-        <Button variant="outline" onClick={() => exportToJSON(events)} disabled={events.length === 0}>
-          <Download className="w-4 h-4 mr-2" />
-          {t('eventList.export_json')}
-        </Button>
-        <Button variant="outline" onClick={() => exportToTXT(events)} disabled={events.length === 0}>
-          <FileText className="w-4 h-4 mr-2" />
-          {t('eventList.export_txt')}
-        </Button>
-         <Button variant="secondary" className="sm:hidden" onClick={reset}>
+      <div className="p-3 border-t border-gray-200 dark:border-gray-700 flex flex-wrap gap-2 justify-between">
+        <div className="flex gap-2">
+          <input
+            ref={importInputRef}
+            type="file"
+            accept=".json,.ics"
+            onChange={handleImport}
+            className="hidden"
+            id="import-file-input"
+          />
+          <Button
+            variant="outline"
+            onClick={() => importInputRef.current?.click()}
+          >
             <Upload className="w-4 h-4 mr-2" />
-            {t('eventList.new')}
+            {t('eventList.import')}
           </Button>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" onClick={() => exportToICS(events)} disabled={events.length === 0}>
+            <Download className="w-4 h-4 mr-2" />
+            {t('eventList.export_ics')}
+          </Button>
+          <Button variant="outline" onClick={() => exportToJSON(events)} disabled={events.length === 0}>
+            <Download className="w-4 h-4 mr-2" />
+            {t('eventList.export_json')}
+          </Button>
+          <Button variant="outline" onClick={() => exportToTXT(events)} disabled={events.length === 0}>
+            <FileText className="w-4 h-4 mr-2" />
+            {t('eventList.export_txt')}
+          </Button>
+           <Button variant="secondary" className="sm:hidden" onClick={reset}>
+              <Upload className="w-4 h-4 mr-2" />
+              {t('eventList.new')}
+            </Button>
+        </div>
       </div>
     </Card>
   );
