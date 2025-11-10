@@ -125,14 +125,14 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-gray-100 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 text-gray-800 dark:text-gray-100 flex flex-col">
       <Header onNewUpload={reset} />
-      <main className="flex-grow container mx-auto p-2 sm:p-4 grid grid-cols-1 lg:grid-cols-12 gap-4 h-[calc(100vh-68px)]">
-        <div className="lg:col-span-4 h-full">
+      <main className="flex-grow container mx-auto p-3 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 h-[calc(100vh-68px)] overflow-auto">
+        <div className="lg:col-span-4 h-full min-h-[400px] lg:min-h-0 animate-fade-in">
             <EventListPanel />
         </div>
-        <div className="lg:col-span-8 h-full grid grid-rows-2 gap-4">
-          <div className="row-span-1">
+        <div className="lg:col-span-8 h-full grid grid-rows-1 lg:grid-rows-2 gap-4 sm:gap-6 animate-fade-in-delayed">
+          <div className="row-span-1 min-h-[300px] lg:min-h-0">
             <ImageViewPanel imageUrl={imageUrl} />
           </div>
           <div className="row-span-1 min-h-[500px] lg:min-h-0">
@@ -147,9 +147,9 @@ const App: React.FC = () => {
           onSave={handleEditSave}
         />
       )}
-       <button 
-        onClick={() => setHelpOpen(true)} 
-        className="fixed bottom-4 right-4 bg-primary-600 hover:bg-primary-700 text-white p-3 rounded-full shadow-lg z-50 transition-transform hover:scale-110"
+       <button
+        onClick={() => setHelpOpen(true)}
+        className="fixed bottom-6 right-6 bg-gradient-to-br from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white p-4 rounded-2xl shadow-2xl z-50 transition-all duration-300 transform hover:scale-110 active:scale-95 hover:shadow-primary-500/50"
         aria-label="Help"
       >
         <HelpCircle className="w-6 h-6" />
