@@ -46,15 +46,15 @@ export function exportToJSON(events: ScheduleEvent[]) {
 }
 
 export function exportToTXT(events: ScheduleEvent[]) {
-  const formatTime = (date: Date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+  const formatTime = (date: Date) => date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
 
   let txtContent = 'Schedule Events\r\n\r\n';
-  
+
   const sortedEvents = [...events].sort((a, b) => a.start.getTime() - b.start.getTime());
 
   sortedEvents.forEach(event => {
     txtContent += `Event: ${event.title}\r\n`;
-    txtContent += `  - Time: ${event.start.toLocaleDateString()} ${formatTime(event.start)} - ${formatTime(event.end)}\r\n`;
+    txtContent += `  - Time: ${event.start.toLocaleDateString('en-US')} ${formatTime(event.start)} - ${formatTime(event.end)}\r\n`;
     if (event.location) {
       txtContent += `  - Location: ${event.location}\r\n`;
     }

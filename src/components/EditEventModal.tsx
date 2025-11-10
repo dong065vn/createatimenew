@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { ScheduleEvent } from '../types';
 import { Card } from './ui/Card';
 import { Button } from './ui/Button';
@@ -24,15 +24,37 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({ event, onClose, 
   const [start, setStart] = useState(formatDateForInput(event.start));
   const [end, setEnd] = useState(formatDateForInput(event.end));
   const [color, setColor] = useState(event.color || '#3b82f6'); // Default to primary blue
+  const [error, setError] = useState<string | null>(null);
+
+  // Clear error when user modifies inputs
+  useEffect(() => {
+    if (error) {
+      setError(null);
+    }
+  }, [title, start, end]);
 
   const handleSave = () => {
+    // Validate title
+    if (!title.trim()) {
+      setError(t('editModal.error_title_required'));
+      return;
+    }
+
+    // Validate start < end
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    if (startDate >= endDate) {
+      setError(t('editModal.error_time_invalid'));
+      return;
+    }
+
     onSave({
       title,
       location,
       instructor,
       note,
-      start: new Date(start),
-      end: new Date(end),
+      start: startDate,
+      end: endDate,
       color,
     });
     onClose();
@@ -48,6 +70,11 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({ event, onClose, 
           </Button>
         </div>
         <div className="p-6 space-y-4">
+          {error && (
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
           <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
             <div className="sm:col-span-4">
               <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('editModal.field_title')}</label>

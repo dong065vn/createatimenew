@@ -35,6 +35,11 @@ const App: React.FC = () => {
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (file) {
+      // Revoke old blob URL before creating new one to prevent memory leak
+      if (imageUrl && imageUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(imageUrl);
+      }
+
       setLoading(true);
       setError(null);
       setImageUrl(URL.createObjectURL(file));
@@ -47,7 +52,7 @@ const App: React.FC = () => {
         // Let reset handle cleanup.
       }
     }
-  }, [setLoading, setImageUrl, setEvents, setError, language]);
+  }, [imageUrl, setLoading, setImageUrl, setEvents, setError, language]);
 
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     onDrop,
@@ -55,7 +60,7 @@ const App: React.FC = () => {
     noClick: true,
     noKeyboard: true,
     multiple: false,
-  });
+  } as any);
   
   const handleEditSave = (updatedData: Partial<typeof events[0]>) => {
     if (editingEvent) {

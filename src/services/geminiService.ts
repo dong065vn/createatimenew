@@ -30,12 +30,11 @@ const fileToBase64 = (file: File): Promise<string> =>
 /**
  * Processes an image file using the Gemini API to extract schedule events.
  * @param file The image file containing the schedule.
- * @param language The target language for the extracted text (currently ignored, defaults to Vietnamese).
+ * @param language The target language for the extracted text ('en' for English, 'vi' for Vietnamese).
  * @returns A promise that resolves with an array of ScheduleEvent objects.
  */
 export const processImage = async (file: File, language: 'en' | 'vi'): Promise<ScheduleEvent[]> => {
-  // Per user request, the output language is always forced to Vietnamese.
-  console.log(`Processing image with Gemini, forcing Vietnamese output for all text fields.`);
+  console.log(`Processing image with Gemini, language: ${language}`);
 
   const base64Data = await fileToBase64(file);
   const mimeType = file.type;
@@ -47,7 +46,7 @@ export const processImage = async (file: File, language: 'en' | 'vi'): Promise<S
     },
   };
 
-  const languageInstruction = 'Vietnamese';
+  const languageInstruction = language === 'vi' ? 'Vietnamese' : 'English';
 
   const textPart = {
     text: `Extract all events from this image of a schedule. It is mandatory that all extracted text content (titles, locations, instructor names, notes) MUST be in ${languageInstruction}. For each event, provide a unique ID, the title, start time, end time, location if available, the instructor's name if available, and a brief note if available. Also provide the bounding box for each event, a confidence score for the extraction, and suggest a suitable hex color code based on the event's title. Ensure date and times are fully qualified ISO 8601 strings. If dates are not specified, infer them based on context, assuming the schedule is for the current week starting today. The output must be a JSON array of event objects matching the provided schema.`,

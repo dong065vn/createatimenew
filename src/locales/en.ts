@@ -45,14 +45,17 @@ const en = {
     "field_instructor": "Instructor",
     "field_note": "Note",
     "cancel": "Cancel",
-    "save": "Save Changes"
+    "save": "Save Changes",
+    "error_title_required": "Title is required.",
+    "error_time_invalid": "Start time must be before end time."
   },
   "calendarHeader": {
     "today": "today",
     "month": "month",
     "week": "week",
     "day": "day",
-    "download_image_label": "Download calendar as image"
+    "download_image_label": "Download calendar as image",
+    "download_error": "Failed to capture calendar. Please try again."
   },
   "imageView": {
     "title": "Original Image"

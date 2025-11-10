@@ -4,6 +4,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { useScheduleStore } from '../store/scheduleStore';
+import { useLanguageStore } from '../store/languageStore';
 import type { EventDropArg, EventClickArg, ViewApi } from '@fullcalendar/core';
 import { Card } from './ui/Card';
 import { EventCard } from './EventCard';
@@ -13,6 +14,7 @@ import { CalendarHeader } from './CalendarHeader';
 type CalendarViewType = 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
 
 export const CalendarView: React.FC = () => {
+  const { t } = useLanguageStore();
   const events = useScheduleStore((state) => state.events);
   const updateEvent = useScheduleStore((state) => state.updateEvent);
   const setEditingEvent = useScheduleStore((state) => state.setEditingEvent);
@@ -121,9 +123,9 @@ export const CalendarView: React.FC = () => {
       link.click();
     } catch (error) {
       console.error("Failed to capture calendar:", error);
-      alert("Không thể chụp ảnh lịch. Vui lòng thử lại.");
+      alert(t('calendarHeader.download_error'));
     }
-  }, []);
+  }, [t]);
 
   const calendarEvents = useMemo(() => events.map(event => ({
     id: event.id,

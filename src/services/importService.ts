@@ -12,6 +12,8 @@ export async function importFromJSON(file: File): Promise<ScheduleEvent[]> {
     ...event,
     start: new Date(event.start),
     end: new Date(event.end),
+    ocrConfidence: event.ocrConfidence ?? 1.0, // Default if not present
+    boundingBox: event.boundingBox ?? { x: 0, y: 0, width: 0, height: 0 }, // Default if not present
   }));
 }
 
@@ -37,6 +39,8 @@ export async function importFromICS(file: File): Promise<ScheduleEvent[]> {
           location: currentEvent.location,
           note: currentEvent.note,
           instructor: currentEvent.instructor,
+          ocrConfidence: 1.0, // Default confidence for imported events
+          boundingBox: { x: 0, y: 0, width: 0, height: 0 }, // No bounding box for imported events
         });
       }
       currentEvent = null;
@@ -76,12 +80,12 @@ export async function importFromICS(file: File): Promise<ScheduleEvent[]> {
 
 function parseICSDate(dateStr: string): Date {
   // Handle format: 20231201T140000Z
-  const year = parseInt(dateStr.substr(0, 4));
-  const month = parseInt(dateStr.substr(4, 2)) - 1;
-  const day = parseInt(dateStr.substr(6, 2));
-  const hour = parseInt(dateStr.substr(9, 2));
-  const minute = parseInt(dateStr.substr(11, 2));
-  const second = parseInt(dateStr.substr(13, 2));
+  const year = parseInt(dateStr.substring(0, 4));
+  const month = parseInt(dateStr.substring(4, 6)) - 1;
+  const day = parseInt(dateStr.substring(6, 8));
+  const hour = parseInt(dateStr.substring(9, 11));
+  const minute = parseInt(dateStr.substring(11, 13));
+  const second = parseInt(dateStr.substring(13, 15));
 
   return new Date(Date.UTC(year, month, day, hour, minute, second));
 }
