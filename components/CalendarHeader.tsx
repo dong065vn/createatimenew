@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { ChevronLeft, ChevronRight, Camera } from 'lucide-react';
-import { useLanguageStore } from '../../store/languageStore';
+import { useLanguageStore } from '../store/languageStore';
 
 type CalendarViewType = 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
 
