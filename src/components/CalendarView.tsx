@@ -51,21 +51,77 @@ export const CalendarView: React.FC = () => {
     calendarApiRef.current?.getApi().changeView(view);
   }, []);
 
-  const handleDownloadImage = useCallback(() => {
+  const handleDownloadImage = useCallback(async () => {
     const calendarEl = calendarWrapperRef.current;
-    if (calendarEl && (window as any).html2canvas) {
-      (window as any).html2canvas(calendarEl, {
-        useCORS: true,
-        // Set background color based on theme to avoid transparent backgrounds on capture
-        backgroundColor: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff', // gray-800 or white
-      }).then((canvas: HTMLCanvasElement) => {
-        const link = document.createElement('a');
-        link.download = `schedule-${new Date().toISOString().slice(0, 10)}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
+    if (!calendarEl || !(window as any).html2canvas) {
+      console.error("Calendar element not found or html2canvas script not loaded.");
+      return;
+    }
+
+    try {
+      // Find all scrollable elements within the calendar
+      const scrollableElements = calendarEl.querySelectorAll('.fc-scroller');
+      const originalStyles: { element: Element; overflow: string; height: string; maxHeight: string }[] = [];
+
+      // Store original styles and temporarily adjust for full capture
+      scrollableElements.forEach((el) => {
+        const htmlEl = el as HTMLElement;
+        originalStyles.push({
+          element: el,
+          overflow: htmlEl.style.overflow,
+          height: htmlEl.style.height,
+          maxHeight: htmlEl.style.maxHeight,
+        });
+
+        // Temporarily adjust styles to show all content
+        htmlEl.style.overflow = 'visible';
+        htmlEl.style.height = 'auto';
+        htmlEl.style.maxHeight = 'none';
       });
-    } else {
-        console.error("Calendar element not found or html2canvas script not loaded.");
+
+      // Wait a bit for styles to apply
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Capture the calendar
+      const canvas = await (window as any).html2canvas(calendarEl, {
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
+        scale: 2, // Higher quality
+        logging: false,
+        windowWidth: calendarEl.scrollWidth,
+        windowHeight: calendarEl.scrollHeight,
+        onclone: (clonedDoc: Document) => {
+          // Ensure all content is visible in the clone
+          const clonedCalendar = clonedDoc.querySelector('.fc');
+          if (clonedCalendar) {
+            const clonedScrollers = clonedCalendar.querySelectorAll('.fc-scroller');
+            clonedScrollers.forEach((scroller) => {
+              const htmlScroller = scroller as HTMLElement;
+              htmlScroller.style.overflow = 'visible';
+              htmlScroller.style.height = 'auto';
+              htmlScroller.style.maxHeight = 'none';
+            });
+          }
+        }
+      });
+
+      // Restore original styles
+      originalStyles.forEach(({ element, overflow, height, maxHeight }) => {
+        const htmlEl = element as HTMLElement;
+        htmlEl.style.overflow = overflow;
+        htmlEl.style.height = height;
+        htmlEl.style.maxHeight = maxHeight;
+      });
+
+      // Download the image
+      const link = document.createElement('a');
+      link.download = `calendar-${new Date().toISOString().slice(0, 10)}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch (error) {
+      console.error("Failed to capture calendar:", error);
+      alert("Không thể chụp ảnh lịch. Vui lòng thử lại.");
     }
   }, []);
 
