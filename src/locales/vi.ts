@@ -45,14 +45,17 @@ const vi = {
     "field_instructor": "Giảng viên",
     "field_note": "Ghi chú",
     "cancel": "Hủy",
-    "save": "Lưu thay đổi"
+    "save": "Lưu thay đổi",
+    "error_title_required": "Tiêu đề không được để trống.",
+    "error_time_invalid": "Thời gian bắt đầu phải trước thời gian kết thúc."
   },
   "calendarHeader": {
     "today": "hôm nay",
     "month": "tháng",
     "week": "tuần",
     "day": "ngày",
-    "download_image_label": "Tải lịch xuống dưới dạng hình ảnh"
+    "download_image_label": "Tải lịch xuống dưới dạng hình ảnh",
+    "download_error": "Không thể chụp ảnh lịch. Vui lòng thử lại."
   },
   "imageView": {
     "title": "Hình ảnh gốc"
