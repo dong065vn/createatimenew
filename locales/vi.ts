@@ -1,0 +1,69 @@
+const vi = {
+  "header": {
+    "title": "LịchTừẢnh",
+    "newUpload": "Tải lên mới"
+  },
+  "home": {
+    "analyzing": "Đang phân tích lịch trình của bạn...",
+    "analyzing_subtext": "Việc này có thể mất một lát. AI đang thực hiện phép màu!",
+    "upload_title": "Tải Lên Lịch Trình Của Bạn",
+    "upload_prompt": "Kéo và thả tệp hình ảnh (PNG, JPG) vào đây, hoặc nhấn nút để chọn.",
+    "upload_prompt_active": "Thả hình ảnh vào đây!",
+    "select_image": "Chọn ảnh",
+    "try_demo": "Thử bản Demo",
+    "processing_failed": "Xử lý thất bại",
+    "try_again": "Thử lại"
+  },
+  "footer": {
+    "powered_by": "Hỗ trợ bởi Gemini AI.",
+    "need_help": "Cần giúp đỡ?",
+    "click_here": "Nhấn vào đây."
+  },
+  "eventList": {
+    "title": "Danh sách sự kiện",
+    "search_placeholder": "Tìm kiếm sự kiện...",
+    "conflicts_detected": "Phát hiện {{count}} sự kiện trùng lặp.",
+    "no_events_found": "Không tìm thấy sự kiện nào.",
+    "no_events_match": "Không có sự kiện nào khớp với tìm kiếm của bạn.",
+    "export_ics": "Xuất ICS",
+    "export_json": "Xuất JSON",
+    "export_txt": "Xuất TXT",
+    "new": "Mới",
+    "minutes_short": "phút"
+  },
+  "editModal": {
+    "title": "Chỉnh sửa sự kiện",
+    "field_title": "Tiêu đề",
+    "field_color": "Màu sắc",
+    "field_start": "Bắt đầu",
+    "field_end": "Kết thúc",
+    "field_location": "Địa điểm",
+    "field_instructor": "Giảng viên",
+    "field_note": "Ghi chú",
+    "cancel": "Hủy",
+    "save": "Lưu thay đổi"
+  },
+  "calendarHeader": {
+    "today": "hôm nay",
+    "month": "tháng",
+    "week": "tuần",
+    "day": "ngày",
+    "download_image_label": "Tải lịch xuống dưới dạng hình ảnh"
+  },
+  "imageView": {
+    "title": "Hình ảnh gốc"
+  },
+  "helpModal": {
+    "title": "Cách hoạt động",
+    "intro": "Chào mừng bạn đến với <strong>LịchTừẢnh</strong>! Công cụ này sử dụng AI để tự động trích xuất các sự kiện từ hình ảnh lịch trình và biến chúng thành lịch kỹ thuật số.",
+    "step1_title": "1. Tải lên lịch trình",
+    "step1_desc": "Nhấp vào 'Chọn ảnh' để tải lên tệp PNG hoặc JPG của lịch trình, hoặc chỉ cần kéo và thả vào khu vực chính. Chưa có sẵn? Nhấp vào 'Thử bản Demo' để xem cách nó hoạt động với hình ảnh mẫu.",
+    "step2_title": "2. Xem & Tương tác",
+    "step2_desc": "Sau khi AI xử lý hình ảnh của bạn, bạn sẽ thấy hình ảnh gốc với các hộp bao quanh sự kiện, danh sách các sự kiện đã trích xuất và chế độ xem lịch đầy đủ. Di chuột qua một sự kiện trong danh sách để làm nổi bật nó trên hình ảnh.",
+    "step3_title": "3. Chỉnh sửa & Xuất",
+    "step3_desc": "Nhấp vào một sự kiện trong danh sách hoặc lịch để chỉnh sửa chi tiết. Bạn cũng có thể kéo và thả các sự kiện trong lịch để sắp xếp lại. Khi hoàn tất, hãy xuất lịch của bạn sang tệp ICS (cho các ứng dụng lịch), JSON hoặc TXT.",
+    "close_button": "Đã hiểu!"
+  }
+};
+
+export default vi;

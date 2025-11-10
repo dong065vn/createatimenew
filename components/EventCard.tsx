@@ -1,0 +1,103 @@
+import React from 'react';
+import type { EventContentArg } from '@fullcalendar/core';
+import type { ScheduleEvent } from '../types';
+
+interface EventCardProps {
+  eventInfo: EventContentArg;
+}
+
+const formatEventTime = (date: Date | null) => {
+  if (!date) return '';
+  // Display time in 24-hour format (e.g., 14:30)
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+}
+
+/**
+ * Lightens a hex color by a given percentage.
+ * @param hex The hex color string (e.g., '#RRGGBB').
+ * @param percent The percentage to lighten (0-100).
+ * @returns The new hex color string.
+ */
+const lightenColor = (hex: string, percent: number): string => {
+    if (!hex || !hex.startsWith('#')) return '#dbeafe'; // Fallback to primary-100
+    let [r, g, b] = hex.slice(1).match(/.{1,2}/g)!.map(c => parseInt(c, 16));
+    const factor = percent / 100;
+    r = Math.min(255, Math.floor(r + (255 - r) * factor));
+    g = Math.min(255, Math.floor(g + (255 - g) * factor));
+    b = Math.min(255, Math.floor(b + (255 - b) * factor));
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+}
+
+/**
+ * Darkens a hex color by a given percentage.
+ * @param hex The hex color string (e.g., '#RRGGBB').
+ * @param percent The percentage to darken (0-100).
+ * @returns The new hex color string.
+ */
+const darkenColor = (hex: string, percent: number): string => {
+    if (!hex || !hex.startsWith('#')) return '#1e40af'; // Fallback to primary-800
+    let [r, g, b] = hex.slice(1).match(/.{1,2}/g)!.map(c => parseInt(c, 16));
+    const factor = 1 - percent / 100;
+    r = Math.floor(r * factor);
+    g = Math.floor(g * factor);
+    b = Math.floor(b * factor);
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+}
+
+
+/**
+ * Custom component for rendering events within FullCalendar.
+ * Matches the UI design provided in the image with specific colors and layout.
+ */
+export const EventCard: React.FC<EventCardProps> = ({ eventInfo }) => {
+  const event = eventInfo.event.extendedProps as ScheduleEvent;
+  const isConflict = event.hasConflict;
+
+  const baseClasses = 'h-full p-1.5 text-xs overflow-hidden flex flex-col w-full rounded-sm';
+
+  if (isConflict) {
+    // For conflicts, we use a simpler, high-contrast style to draw attention.
+    const conflictStyle = 'bg-red-100 text-red-800 border-l-4 border-red-500 dark:bg-red-900/50 dark:text-red-200 dark:border-red-500';
+    return (
+      <div className={`${baseClasses} ${conflictStyle}`}>
+          <div className="font-bold truncate">{eventInfo.event.title}</div>
+          <div className="opacity-90">{formatEventTime(eventInfo.event.start)}</div>
+          {event.location && (
+              <div className="opacity-90 truncate">
+                  {event.location}
+              </div>
+          )}
+          {event.instructor && (
+            <div className="opacity-90 truncate">{event.instructor}</div>
+          )}
+      </div>
+    );
+  }
+
+  const baseColor = event.color || '#3b82f6'; // Default to primary-500
+
+  const customStyle: React.CSSProperties = {
+    backgroundColor: lightenColor(baseColor, 85),
+    borderLeft: `4px solid ${baseColor}`,
+  };
+
+  const titleStyle: React.CSSProperties = { color: darkenColor(baseColor, 15) };
+  const detailsStyle: React.CSSProperties = { color: darkenColor(baseColor, 5) };
+
+  return (
+    <div style={customStyle} className={baseClasses}>
+        <div style={titleStyle} className="font-bold truncate">{eventInfo.event.title}</div>
+        <div style={detailsStyle}>{formatEventTime(eventInfo.event.start)}</div>
+        {event.location && (
+            <div style={detailsStyle} className="truncate">
+                {event.location}
+            </div>
+        )}
+        {event.instructor && (
+            <div style={detailsStyle} className="truncate">
+                {event.instructor}
+            </div>
+        )}
+    </div>
+  );
+};

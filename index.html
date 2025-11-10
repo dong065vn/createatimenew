@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ScheduleFromImage</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              'primary': {
+                '50': '#eff6ff',
+                '100': '#dbeafe',
+                '200': '#bfdbfe',
+                '300': '#93c5fd',
+                '400': '#60a5fa',
+                '500': '#3b82f6',
+                '600': '#2563eb',
+                '700': '#1d4ed8',
+                '800': '#1e40af',
+                '900': '#1e3a8a',
+                '950': '#172554',
+              },
+            }
+          }
+        }
+      }
+    </script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css' rel='stylesheet' />
+    <link rel="stylesheet" href="/fullcalendar.css" />
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.548.0",
+    "@fullcalendar/interaction": "https://aistudiocdn.com/@fullcalendar/interaction@^6.1.19",
+    "@fullcalendar/daygrid": "https://aistudiocdn.com/@fullcalendar/daygrid@^6.1.19",
+    "@fullcalendar/core": "https://aistudiocdn.com/@fullcalendar/core@^6.1.19",
+    "@fullcalendar/react": "https://aistudiocdn.com/@fullcalendar/react@^6.1.19",
+    "@fullcalendar/timegrid": "https://aistudiocdn.com/@fullcalendar/timegrid@^6.1.19",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.28.0",
+    "react-dropzone": "https://aistudiocdn.com/react-dropzone@^14.3.8",
+    "zustand": "https://aistudiocdn.com/zustand@^5.0.8"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

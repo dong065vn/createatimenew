@@ -1,0 +1,5 @@
+{
+  "name": "ScheduleFromImage",
+  "description": "An application to convert schedule images into manageable digital events. Users can upload an image, view the extracted schedule on a calendar and list, edit events, and export them to popular formats.",
+  "requestFramePermissions": []
+}

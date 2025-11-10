@@ -1,0 +1,67 @@
+.fc {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.fc .fc-view-harness {
+  flex-grow: 1;
+  overflow: auto;
+  min-height: 0;
+}
+.fc-theme-standard .fc-list-day-cushion {
+  background-color: #f3f4f6;
+}
+.dark .fc-theme-standard .fc-list-day-cushion {
+  background-color: #374151;
+}
+
+/* Make grid lines a bit lighter */
+.fc-theme-standard .fc-timegrid-slots tr > td,
+.fc-theme-standard td, .fc-theme-standard th {
+  border-color: #e5e7eb; /* gray-200 */
+}
+.dark .fc-theme-standard td, .dark .fc-theme-standard th {
+  border-color: #374151; /* gray-700 */
+}
+
+/* Bolder day headers (Sun, Mon, etc.) to match image */
+.fc .fc-col-header-cell-cushion {
+  font-weight: 700; /* Bold */
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  color: #1f2937; /* gray-800 */
+}
+.dark .fc .fc-col-header-cell-cushion {
+    color: #f9fafb; /* gray-50 */
+}
+
+/* Custom overrides for custom event rendering */
+.fc-event {
+  border: none !important;
+  background-color: transparent !important;
+  /* Adjust padding to allow custom card to fill space while having a small gap */
+  padding: 1px 2px !important; 
+  cursor: pointer;
+  height: 100%;
+  width: 100%;
+}
+
+.fc-event .fc-event-main {
+  height: 100%;
+}
+
+/* Remove padding from inner frame to let our custom card control it */
+.fc-v-event .fc-event-main-frame,
+.fc-daygrid-event .fc-event-main-frame {
+  padding: 0;
+}
+
+
+/* Highlight for the current day */
+.fc .fc-daygrid-day.fc-day-today {
+  background-color: #fef9c3 !important; /* yellow-100 */
+}
+.dark .fc .fc-daygrid-day.fc-day-today {
+  background-color: rgba(234, 179, 8, 0.15) !important; /* yellow-500 with alpha */
+}
