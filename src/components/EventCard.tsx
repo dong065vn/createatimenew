@@ -53,25 +53,25 @@ export const EventCard: React.FC<EventCardProps> = ({ eventInfo }) => {
   const event = eventInfo.event.extendedProps as ScheduleEvent;
   const isConflict = event.hasConflict;
 
-  const baseClasses = 'h-full p-2 text-xs overflow-hidden flex flex-col w-full rounded-lg shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer backdrop-blur-sm';
+  const baseClasses = 'h-full p-2 text-xs overflow-visible flex flex-col w-full rounded-lg shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer backdrop-blur-sm min-h-fit';
 
   if (isConflict) {
     // For conflicts, we use a simpler, high-contrast style to draw attention with animation
     const conflictStyle = 'bg-gradient-to-br from-red-50 to-red-100 text-red-900 border-l-4 border-red-500 dark:from-red-900/40 dark:to-red-800/40 dark:text-red-100 dark:border-red-400 animate-pulse-subtle';
     return (
       <div className={`${baseClasses} ${conflictStyle}`}>
-          <div className="font-bold truncate text-sm mb-1 flex items-center gap-1">
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
-            {eventInfo.event.title}
+          <div className="font-bold text-sm mb-1 flex items-center gap-1 break-words">
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse flex-shrink-0"></span>
+            <span className="break-words">{eventInfo.event.title}</span>
           </div>
           <div className="opacity-90 font-medium">{formatEventTime(eventInfo.event.start)}</div>
           {event.location && (
-              <div className="opacity-80 truncate text-[10px] mt-0.5">
+              <div className="opacity-80 text-[10px] mt-0.5 break-words">
                   📍 {event.location}
               </div>
           )}
           {event.instructor && (
-            <div className="opacity-80 truncate text-[10px]">👤 {event.instructor}</div>
+            <div className="opacity-80 text-[10px] break-words">👤 {event.instructor}</div>
           )}
       </div>
     );
@@ -95,18 +95,18 @@ export const EventCard: React.FC<EventCardProps> = ({ eventInfo }) => {
 
   return (
     <div style={customStyle} className={baseClasses}>
-        <div style={titleStyle} className="truncate text-sm mb-1 leading-tight">{eventInfo.event.title}</div>
+        <div style={titleStyle} className="text-sm mb-1 leading-tight break-words">{eventInfo.event.title}</div>
         <div style={detailsStyle} className="font-medium flex items-center gap-1">
           <span className="inline-block w-1 h-1 rounded-full opacity-60" style={{backgroundColor: baseColor}}></span>
           {formatEventTime(eventInfo.event.start)}
         </div>
         {event.location && (
-            <div style={detailsStyle} className="truncate text-[10px] mt-0.5 opacity-80">
+            <div style={detailsStyle} className="text-[10px] mt-0.5 opacity-80 break-words">
                 📍 {event.location}
             </div>
         )}
         {event.instructor && (
-            <div style={detailsStyle} className="truncate text-[10px] opacity-80">
+            <div style={detailsStyle} className="text-[10px] opacity-80 break-words">
                 👤 {event.instructor}
             </div>
         )}
