@@ -49,7 +49,37 @@ export const processImage = async (file: File, language: 'en' | 'vi'): Promise<S
   const languageInstruction = language === 'vi' ? 'Vietnamese' : 'English';
 
   const textPart = {
-    text: `Extract all events from this image of a schedule. It is mandatory that all extracted text content (titles, locations, instructor names, notes) MUST be in ${languageInstruction}. For each event, provide a unique ID, the title, start time, end time, location if available, the instructor's name if available, and a brief note if available. Also provide the bounding box for each event, a confidence score for the extraction, and suggest a suitable hex color code based on the event's title. Ensure date and times are fully qualified ISO 8601 strings. If dates are not specified, infer them based on context, assuming the schedule is for the current week starting today. The output must be a JSON array of event objects matching the provided schema.`,
+    text: `You are an expert OCR system specialized in reading schedules and timetables from images.
+
+CRITICAL INSTRUCTIONS:
+1. READ TEXT EXACTLY AS IT APPEARS - Do NOT guess, infer, or modify any text. Copy character by character.
+2. If text is unclear or partially visible, set a lower ocrConfidence score (0.3-0.6) but still attempt to read it.
+3. Do NOT translate or change the original text - keep it exactly as shown in the image.
+4. Pay special attention to:
+   - Vietnamese diacritics (ă, â, đ, ê, ô, ơ, ư, à, á, ả, ã, ạ, etc.)
+   - Numbers and times (distinguish 0/O, 1/l/I, 5/S, 8/B)
+   - Special characters and punctuation
+
+EXTRACTION TASK:
+Extract ALL events/items from this schedule image. For each event provide:
+- id: A unique identifier (use format "event_1", "event_2", etc.)
+- title: The exact title/name as shown (DO NOT modify or translate)
+- start: Start date and time in ISO 8601 format
+- end: End date and time in ISO 8601 format  
+- location: The location if shown (exact text)
+- instructor: The instructor/teacher name if shown (exact text)
+- note: Any additional notes or descriptions (exact text)
+- ocrConfidence: Your confidence in the text extraction (0.0 to 1.0)
+- boundingBox: Approximate position {x, y, width, height} as percentages (0-100)
+- color: A suitable hex color code based on the event type/category
+
+DATE/TIME RULES:
+- If only time is shown without date, assume the schedule starts from today (${new Date().toISOString().split('T')[0]})
+- If day names are shown (Monday, Tuesday, etc. or Thứ 2, Thứ 3, etc.), calculate the actual date based on current week
+- Times should be in 24-hour format in the ISO string
+
+Output language for any generated text (not extracted): ${languageInstruction}
+Return a JSON array of event objects.`,
   };
 
   const responseSchema = {
