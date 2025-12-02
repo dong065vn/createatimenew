@@ -69,30 +69,50 @@ export const CalendarView: React.FC = () => {
       calendarApi?.setOption('dayMaxEvents', false);
 
       // Wait for calendar to re-render with all events
-      await new Promise(resolve => requestAnimationFrame(() => {
-        requestAnimationFrame(resolve);
-      }));
+      await new Promise(resolve => setTimeout(resolve, 100));
 
-      // Step 2: Find and prepare elements for capture
+      // Step 2: Find ALL elements that need style changes
       const calendarContainer = calendarEl.querySelector('.calendar-container') as HTMLElement;
-      const fcScrollers = calendarEl.querySelectorAll('.fc-scroller');
+      const fcScrollers = calendarEl.querySelectorAll('.fc-scroller, .fc-scroller-liquid, .fc-scroller-liquid-absolute');
+      const fcViewHarness = calendarEl.querySelector('.fc-view-harness') as HTMLElement;
+      const fcView = calendarEl.querySelector('.fc-view') as HTMLElement;
       const todayCells = calendarEl.querySelectorAll('.fc-day-today');
+      const wrapperEl = calendarEl as HTMLElement;
 
       if (!calendarContainer) {
         throw new Error('Calendar container not found');
       }
 
-      // Step 3: Store original styles (only what we need)
+      // Step 3: Store original styles
       const savedStyles = {
+        wrapper: {
+          overflow: wrapperEl.style.overflow,
+          height: wrapperEl.style.height,
+          maxHeight: wrapperEl.style.maxHeight,
+          position: wrapperEl.style.position,
+        },
         container: {
           overflow: calendarContainer.style.overflow,
           height: calendarContainer.style.height,
+          maxHeight: calendarContainer.style.maxHeight,
+          flex: calendarContainer.style.flex,
         },
+        viewHarness: fcViewHarness ? {
+          overflow: fcViewHarness.style.overflow,
+          height: fcViewHarness.style.height,
+          maxHeight: fcViewHarness.style.maxHeight,
+          position: fcViewHarness.style.position,
+        } : null,
+        fcView: fcView ? {
+          overflow: fcView.style.overflow,
+          height: fcView.style.height,
+        } : null,
         scrollers: Array.from(fcScrollers).map(el => ({
           element: el as HTMLElement,
           overflow: (el as HTMLElement).style.overflow,
           height: (el as HTMLElement).style.height,
           maxHeight: (el as HTMLElement).style.maxHeight,
+          position: (el as HTMLElement).style.position,
         })),
         todayCells: Array.from(todayCells).map(el => ({
           element: el as HTMLElement,
@@ -101,51 +121,95 @@ export const CalendarView: React.FC = () => {
         }))
       };
 
-      // Step 4: Expand to show all content
+      // Step 4: Expand wrapper
+      wrapperEl.style.overflow = 'visible';
+      wrapperEl.style.height = 'auto';
+      wrapperEl.style.maxHeight = 'none';
+
+      // Step 5: Expand container
       calendarContainer.style.overflow = 'visible';
       calendarContainer.style.height = 'auto';
+      calendarContainer.style.maxHeight = 'none';
+      calendarContainer.style.flex = 'none';
 
+      // Step 6: Expand view harness
+      if (fcViewHarness) {
+        fcViewHarness.style.overflow = 'visible';
+        fcViewHarness.style.height = 'auto';
+        fcViewHarness.style.maxHeight = 'none';
+        fcViewHarness.style.position = 'relative';
+      }
+
+      if (fcView) {
+        fcView.style.overflow = 'visible';
+        fcView.style.height = 'auto';
+      }
+
+      // Step 7: Expand all scrollers
       fcScrollers.forEach(scroller => {
         const el = scroller as HTMLElement;
         el.style.overflow = 'visible';
         el.style.height = 'auto';
         el.style.maxHeight = 'none';
+        el.style.position = 'relative';
       });
 
-      // Step 5: Fix today cells - remove animation and set solid background for capture
+      // Step 8: Fix today cells
       const isDark = document.documentElement.classList.contains('dark');
       todayCells.forEach(cell => {
         const el = cell as HTMLElement;
         el.style.animation = 'none';
         el.style.background = isDark 
-          ? 'rgba(59, 130, 246, 0.15)' // Subtle blue for dark mode
-          : 'rgba(59, 130, 246, 0.1)'; // Subtle blue for light mode
+          ? 'rgba(59, 130, 246, 0.15)'
+          : 'rgba(59, 130, 246, 0.1)';
       });
 
       // Wait for layout to stabilize
-      await new Promise(resolve => requestAnimationFrame(() => {
-        requestAnimationFrame(resolve);
-      }));
+      await new Promise(resolve => setTimeout(resolve, 200));
 
-      // Step 6: Capture the calendar
+      // Step 9: Capture the calendar with full dimensions
       const canvas = await html2canvas(calendarEl, {
         useCORS: true,
         allowTaint: true,
         backgroundColor: isDark ? '#1f2937' : '#ffffff',
         scale: 2,
         logging: false,
-        windowWidth: calendarEl.scrollWidth,
-        windowHeight: calendarEl.scrollHeight,
+        width: calendarEl.scrollWidth,
+        height: calendarEl.scrollHeight,
+        scrollX: 0,
+        scrollY: 0,
+        x: 0,
+        y: 0,
       });
 
-      // Step 7: Restore all original styles
+      // Step 10: Restore all original styles
+      wrapperEl.style.overflow = savedStyles.wrapper.overflow;
+      wrapperEl.style.height = savedStyles.wrapper.height;
+      wrapperEl.style.maxHeight = savedStyles.wrapper.maxHeight;
+      wrapperEl.style.position = savedStyles.wrapper.position;
+
       calendarContainer.style.overflow = savedStyles.container.overflow;
       calendarContainer.style.height = savedStyles.container.height;
+      calendarContainer.style.maxHeight = savedStyles.container.maxHeight;
+      calendarContainer.style.flex = savedStyles.container.flex;
 
-      savedStyles.scrollers.forEach(({ element, overflow, height, maxHeight }) => {
+      if (fcViewHarness && savedStyles.viewHarness) {
+        fcViewHarness.style.overflow = savedStyles.viewHarness.overflow;
+        fcViewHarness.style.height = savedStyles.viewHarness.height;
+        fcViewHarness.style.maxHeight = savedStyles.viewHarness.maxHeight;
+        fcViewHarness.style.position = savedStyles.viewHarness.position;
+      }
+
+      if (fcView && savedStyles.fcView) {
+        fcView.style.overflow = savedStyles.fcView.overflow;
+        fcView.style.height = savedStyles.fcView.height;
+      }
+
+      savedStyles.scrollers.forEach(({ element, overflow, height, maxHeight, position }) => {
         element.style.overflow = overflow;
         element.style.height = height;
         element.style.maxHeight = maxHeight;
+        element.style.position = position;
       });
 
       savedStyles.todayCells.forEach(({ element, background, animation }) => {
@@ -158,7 +222,7 @@ export const CalendarView: React.FC = () => {
         calendarApi.setOption('dayMaxEvents', originalDayMaxEvents);
       }
 
-      // Step 8: Download the image
+      // Step 11: Download the image
       const link = document.createElement('a');
       link.download = `calendar-${new Date().toISOString().slice(0, 10)}.png`;
       link.href = canvas.toDataURL('image/png');
