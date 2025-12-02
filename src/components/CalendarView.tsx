@@ -76,6 +76,7 @@ export const CalendarView: React.FC = () => {
       // Step 2: Find and prepare elements for capture
       const calendarContainer = calendarEl.querySelector('.calendar-container') as HTMLElement;
       const fcScrollers = calendarEl.querySelectorAll('.fc-scroller');
+      const todayCells = calendarEl.querySelectorAll('.fc-day-today');
 
       if (!calendarContainer) {
         throw new Error('Calendar container not found');
@@ -92,6 +93,11 @@ export const CalendarView: React.FC = () => {
           overflow: (el as HTMLElement).style.overflow,
           height: (el as HTMLElement).style.height,
           maxHeight: (el as HTMLElement).style.maxHeight,
+        })),
+        todayCells: Array.from(todayCells).map(el => ({
+          element: el as HTMLElement,
+          background: (el as HTMLElement).style.background,
+          animation: (el as HTMLElement).style.animation,
         }))
       };
 
@@ -106,23 +112,33 @@ export const CalendarView: React.FC = () => {
         el.style.maxHeight = 'none';
       });
 
+      // Step 5: Fix today cells - remove animation and set solid background for capture
+      const isDark = document.documentElement.classList.contains('dark');
+      todayCells.forEach(cell => {
+        const el = cell as HTMLElement;
+        el.style.animation = 'none';
+        el.style.background = isDark 
+          ? 'rgba(59, 130, 246, 0.15)' // Subtle blue for dark mode
+          : 'rgba(59, 130, 246, 0.1)'; // Subtle blue for light mode
+      });
+
       // Wait for layout to stabilize
       await new Promise(resolve => requestAnimationFrame(() => {
         requestAnimationFrame(resolve);
       }));
 
-      // Step 5: Capture the calendar
+      // Step 6: Capture the calendar
       const canvas = await html2canvas(calendarEl, {
         useCORS: true,
         allowTaint: true,
-        backgroundColor: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
+        backgroundColor: isDark ? '#1f2937' : '#ffffff',
         scale: 2,
         logging: false,
         windowWidth: calendarEl.scrollWidth,
         windowHeight: calendarEl.scrollHeight,
       });
 
-      // Step 6: Restore all original styles
+      // Step 7: Restore all original styles
       calendarContainer.style.overflow = savedStyles.container.overflow;
       calendarContainer.style.height = savedStyles.container.height;
 
@@ -132,12 +148,17 @@ export const CalendarView: React.FC = () => {
         element.style.maxHeight = maxHeight;
       });
 
+      savedStyles.todayCells.forEach(({ element, background, animation }) => {
+        element.style.background = background;
+        element.style.animation = animation;
+      });
+
       // Restore event limit
       if (calendarApi && originalDayMaxEvents !== undefined) {
         calendarApi.setOption('dayMaxEvents', originalDayMaxEvents);
       }
 
-      // Step 7: Download the image
+      // Step 8: Download the image
       const link = document.createElement('a');
       link.download = `calendar-${new Date().toISOString().slice(0, 10)}.png`;
       link.href = canvas.toDataURL('image/png');
