@@ -76,7 +76,6 @@ export const CalendarView: React.FC = () => {
       const fcScrollers = calendarEl.querySelectorAll('.fc-scroller, .fc-scroller-liquid, .fc-scroller-liquid-absolute');
       const fcViewHarness = calendarEl.querySelector('.fc-view-harness') as HTMLElement;
       const fcView = calendarEl.querySelector('.fc-view') as HTMLElement;
-      const todayCells = calendarEl.querySelectorAll('.fc-day-today');
       const wrapperEl = calendarEl as HTMLElement;
 
       if (!calendarContainer) {
@@ -113,11 +112,6 @@ export const CalendarView: React.FC = () => {
           height: (el as HTMLElement).style.height,
           maxHeight: (el as HTMLElement).style.maxHeight,
           position: (el as HTMLElement).style.position,
-        })),
-        todayCells: Array.from(todayCells).map(el => ({
-          element: el as HTMLElement,
-          background: (el as HTMLElement).style.background,
-          animation: (el as HTMLElement).style.animation,
         }))
       };
 
@@ -154,20 +148,12 @@ export const CalendarView: React.FC = () => {
         el.style.position = 'relative';
       });
 
-      // Step 8: Fix today cells
-      const isDark = document.documentElement.classList.contains('dark');
-      todayCells.forEach(cell => {
-        const el = cell as HTMLElement;
-        el.style.animation = 'none';
-        el.style.background = isDark 
-          ? 'rgba(59, 130, 246, 0.15)'
-          : 'rgba(59, 130, 246, 0.1)';
-      });
-
       // Wait for layout to stabilize
       await new Promise(resolve => setTimeout(resolve, 200));
 
-      // Step 9: Capture the calendar with full dimensions
+      const isDark = document.documentElement.classList.contains('dark');
+
+      // Step 8: Capture the calendar with full dimensions
       const canvas = await html2canvas(calendarEl, {
         useCORS: true,
         allowTaint: true,
@@ -210,11 +196,6 @@ export const CalendarView: React.FC = () => {
         element.style.height = height;
         element.style.maxHeight = maxHeight;
         element.style.position = position;
-      });
-
-      savedStyles.todayCells.forEach(({ element, background, animation }) => {
-        element.style.background = background;
-        element.style.animation = animation;
       });
 
       // Restore event limit
